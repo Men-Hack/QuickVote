@@ -90,19 +90,31 @@ contract VotingContract{
         }
     }
 
-
-
-    function vote ( string memory code) public payable {
-        address sender = msg.sender;
-        require(voted[sender] == false, "user already voted");
-        voted[sender] = true;
-        address c = codetoadd[code];
-        voter2cont[sender] = c;
-        ContDetails storage m = contenderdet[c];
-        m.votersNo += 1;
-        emit voteSuccess(sender, c, code);
+     function startVoting() public onlyRegistrar votingNotStarted {
+        require(contendersList.length > 0, "No contenders registered");
+        
+        votingActive = true;
+        votingStartTime = block.timestamp;
+        votingEndTime = block.timestamp + VOTING_DURATION;
     }
 
+    // Cast a vote
+    function vote(string memory code) public votingIsActive {
+        address sender = msg.sender;
+        require(!voted[sender], "User already voted");
+        
+        address contender = codeToAddress[code];
+        require(contender != address(0), "Invalid contender code");
+        require(contenderDetails[contender].exists, "Contender does not exist");
+
+        voted[sender] = true;
+        voterToContender[sender] = contender;
+        
+        ContDetails storage m = contenderDetails[contender];
+        m.votersNo += 1;
+        
+        emit VoteSuccess(sender, contender, code);
+    }
 
     function getContender (string memory code) public view returns(ContDetails memory)  {
         address c = codetoadd[code];
