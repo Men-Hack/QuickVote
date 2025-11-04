@@ -31,10 +31,12 @@ contract VotingContract{
         string code;
         uint32 votersNo;
     }  
-    mapping (address => bool) voted;
-    mapping (string => address) codetoadd;
-    mapping (address => address) voter2cont;
-    mapping (address => ContDetails) contenderdet;
+
+    address[] public contendersList;
+    mapping(address => bool) public voted;
+    mapping(string => address) public codeToAddress;
+    mapping(address => address) public voterToContender;
+    mapping(address => ContDetails) public contenderDetails;
 
 
     function registration ( address cont, string memory code) public {
