@@ -38,6 +38,11 @@ contract VotingContract{
     mapping(address => address) public voterToContender;
     mapping(address => ContDetails) public contenderDetails;
 
+    modifier onlyRegistrar() {
+        require(msg.sender == registrar, "Only registrar can call this");
+        _;
+    }
+
 
     function registration ( address cont, string memory code) public {
         codetoadd[code] = cont;
