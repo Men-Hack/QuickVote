@@ -42,7 +42,7 @@ contract VotingContract{
         require(msg.sender == registrar, "Only registrar can call this");
         _;
     }
-    
+
     modifier votingIsActive() {
         require(votingActive, "Voting is not active");
         require(block.timestamp >= votingStartTime, "Voting has not started");
@@ -59,16 +59,38 @@ contract VotingContract{
         registrar = msg.sender;
     }
 
+        function registerContender(address cont, string memory code) public onlyRegistrar votingNotStarted {
+        require(cont != address(0), "Invalid contender address");
+        require(bytes(code).length > 0, "Code cannot be empty");
+        require(codeToAddress[code] == address(0), "Code already exists");
+        require(!contenderDetails[cont].exists, "Contender already registered");
 
-    function registration ( address cont, string memory code) public {
-        codetoadd[code] = cont;
-        ContDetails storage c = contenderdet[cont];
+        codeToAddress[code] = cont;
+        contendersList.push(cont);
+        
+        ContDetails storage c = contenderDetails[cont];
+        c.contender = cont;
         c.code = code;
         c.votersNo = 0;
+        c.exists = true;
 
-        emit contRegistered ( cont, code);
-
+        emit ContenderRegistered(cont, code);
     }
+
+    // Register multiple contenders at once
+    function registerMultipleContenders(
+        address[] memory contenders, 
+        string[] memory codes
+    ) public onlyRegistrar votingNotStarted {
+        require(contenders.length == codes.length, "Arrays length mismatch");
+        require(contenders.length > 0, "No contenders provided");
+
+        for (uint256 i = 0; i < contenders.length; i++) {
+            registerContender(contenders[i], codes[i]);
+        }
+    }
+
+
 
     function vote ( string memory code) public payable {
         address sender = msg.sender;
