@@ -13,7 +13,18 @@ contract VotingContract{
         string indexed code
     ); 
 
-    address voter;
+        event VotingEnded(
+        address[] winners,
+        uint32 highestVotes
+    );
+
+    address public immutable registrar;
+    uint256 public votingStartTime;
+    uint256 public votingEndTime;
+    uint256 public constant VOTING_DURATION = 7 days;
+    bool public votingActive;
+    bool public votingEnded;
+
 
     struct ContDetails {
         address contender;
