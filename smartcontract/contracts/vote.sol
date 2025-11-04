@@ -42,6 +42,22 @@ contract VotingContract{
         require(msg.sender == registrar, "Only registrar can call this");
         _;
     }
+    
+    modifier votingIsActive() {
+        require(votingActive, "Voting is not active");
+        require(block.timestamp >= votingStartTime, "Voting has not started");
+        require(block.timestamp <= votingEndTime, "Voting period has ended");
+        _;
+    }
+
+    modifier votingNotStarted() {
+        require(!votingActive, "Voting already started");
+        _;
+    }
+
+    constructor() {
+        registrar = msg.sender;
+    }
 
 
     function registration ( address cont, string memory code) public {
